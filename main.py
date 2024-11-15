@@ -39,7 +39,8 @@ def check(v1, v2, v3):
     return msg
 
 
-def get_x_y_oper(memory):
+def get_x_y_oper():
+    global memory
     while True:
         print(msg_0)
         calc = input().split()
@@ -50,8 +51,6 @@ def get_x_y_oper(memory):
             x = memory
         if y == 'M':
             y = memory
-        if x != 'M' and y != 'M':
-            memory = 0
         operations = ['+', '-', '*', '/']
         try:
             x = float(x)
@@ -68,7 +67,7 @@ def get_x_y_oper(memory):
             else:
                 if len(check_result) != 0:
                     print(check_result)
-                return x, oper, y
+                return calculate_result(x, oper, y)
         except:
             print(msg_1)
 
@@ -83,42 +82,64 @@ def messages_creator(msg_index):
         return msg_12
 
 
-def message_four(msg_index, memory):
-    details = get_x_y_oper(memory)
-    calculated_result = calculate_result(details[0], details[1], details[2])
-    print(calculated_result)
+def is_one_digit(result):
+    global memory
+    msg_index = 10
+    if -10 < result < 10 and result.is_integer():
+        while msg_index <= 12:
+            m = messages_creator(msg_index)
+            print(m)
+            ans = input()
+            if ans == 'y':
+                msg_index += 1
+                if msg_index == 13:
+                    memory = result
+            if ans == 'n':
+                break
+    else:
+        memory = result
+    return memory
+
+
+def message_four(result):
+    global memory
     #"Do you want to store the result? (y / n):"
     print(msg_4)
     answer = input()
     if answer == 'y':
-        if -10 < calculated_result < 10 and calculated_result.is_integer():
-            while msg_index <= 12:
-                m = messages_creator(msg_index)
-                print(m)
-                ans = input()
-                if ans == 'y':
-                    msg_index += 1
-                    if msg_index == 13:
-                        message_five(calculated_result)
-                if ans == 'n':
-                    break
-        else:
-            return calculated_result
+        memory = is_one_digit(result)
+        message_five()
     if answer == 'n':
-        message_five(0)
+        memory = 0
+        message_five()
 
 
-def message_five(memory):
-    while True:
-        print(msg_5)
-        answer = input()
-        if answer == 'y':
-            result = message_four(msg_index, memory)
-            return result
-        if answer == 'n':
-            break
+def message_five():
+    global memory
+    print(msg_5)
+    # "Do you want to continue calculations? (y / n):"
+    answer = input()
+    if answer == 'y':
+        result = get_x_y_oper()
+        print(result)
+        message_four(result)
+    if answer == 'n':
+        return 'n'
 
 
-msg_index = 10
+memory = 0
 while True:
-    memory = message_four(msg_index, 0)
+    result = get_x_y_oper()
+    print(result)
+    print(msg_4)
+    answer = input()
+    if answer == 'y':
+        memory = is_one_digit(result)
+        five = message_five()
+        if five is None or five == 'n':
+            break
+    if answer == 'n':
+        memory = 0
+        five = message_five()
+        if five is None or five == 'n':
+            break
